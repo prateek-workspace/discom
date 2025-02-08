@@ -1,7 +1,5 @@
 <div align="center">
-<img width="30%" src="https://github.com/prateek-workspace/discom/assets/110523559/001aa210-6a13-413f-aa58-5a7650e2cf33">
-
-# Discom
+<img width="30%" src="https://github.com/user-attachments/assets/50b473ce-9671-4f1c-a786-d1adbc6f7a9a">
 </div>
 
 ### Cloning the repository
@@ -19,6 +17,7 @@ cd discom
 ```
 
 --> Create a virtual environment :
+
 ```bash
 # Let's install virtualenv first
 pip install virtualenv
@@ -74,31 +73,33 @@ After login, find the room you want to connect, Click on join video room, after 
 <p align="center">
   Feed Home
 </p>
-<img src="https://github.com/prateek-workspace/discom/assets/110523559/7fcdce3e-b372-43b9-821d-e33f234a9e84">
+<img src="https://github.com/user-attachments/assets/b243faf2-2deb-46e3-89b6-71847b26088a">
 </td> 
 <td width="50%">
 <br>
 <p align="center">
   Room Conversation Preview 1 (Create Video Room)
 </p>
-<img src="https://github.com/prateek-workspace/discom/assets/110523559/40960b31-45d5-47da-9a18-c20829ebc5fc">  
+<img src="https://github.com/user-attachments/assets/79aa65c9-011d-4620-b219-1d8d0f18a874">  
 </td>
 </tr>
 <tr>
 <td width="50%">      
-&nbsp; 
+&nbsp;
+
 <br>
 <p align="center">
   Room Conversation Preview 2 (Join Video Room)
 </p>
-<img src="https://github.com/prateek-workspace/discom/assets/110523559/e66eb4be-eb2d-4ec2-bc70-16687fc0c406">
+<img src="https://github.com/user-attachments/assets/89af222e-8780-45b4-91af-bc731ee24aaf">
 </td> 
 <td width="50%">
 <br>
+
 <p align="center">
   User Profile
 </p>
-<img src="https://github.com/prateek-workspace/discom/assets/110523559/24e9c94a-be8e-4912-8640-352144116f48">  
+<img src="https://github.com/user-attachments/assets/f7cac4db-f10a-4f05-b5f7-38a50ff8389e">  
 </td>
 </tr>
 <tr>
@@ -108,11 +109,13 @@ After login, find the room you want to connect, Click on join video room, after 
 <p align="center">
   Video Room 1 (Demo)
 </p>
+
 <img src="https://github.com/prateek-workspace/discom/assets/110523559/2d6f0367-7144-4b3e-849a-8aac2a5519f3">
 </td> 
 <td width="50%">
 <br>
 <p align="center">
+
   Video Room 2 (Demo)
 </p>
 <img src="https://github.com/prateek-workspace/discom/assets/110523559/fa12b792-4197-41bf-ba25-0755399718ef">  
