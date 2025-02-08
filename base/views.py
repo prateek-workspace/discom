@@ -6,6 +6,10 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from .models import Room, Topic, Message, User
 from .forms import RoomForm, UserForm, MyUserCreationForm
+from django.core.paginator import Paginator
+from django.db.models.functions import TruncDate
+from django.utils import timezone
+from datetime import datetime
 
 # Create your views here.
 
@@ -67,32 +71,46 @@ def registerPage(request):
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
 
-    # filtering rooms to show top 5
     rooms = Room.objects.filter(
         Q(topic__name__icontains=q) |
         Q(name__icontains=q) |
         Q(description__icontains=q)
     )
 
-    # filtering topics to show top 5
+    # Update pagination to show 4 rooms per page
+    paginator = Paginator(rooms, 4)
+    page = request.GET.get('page', 1)
+    rooms_paginated = paginator.get_page(page)
+    
     topics = Topic.objects.all()[0:5]
-    # old counter for rooms
-    # room_count = rooms.count()
     room_count = Room.objects.count()
     room_messages = Message.objects.filter(
         Q(room__topic__name__icontains=q))[0:5]
 
-    context = {'rooms': rooms, 'topics': topics,
-               'room_count': room_count, 'room_messages': room_messages}
+    # Get active users, ordered randomly, limited to 12
+    users = User.objects.filter(is_active=True).order_by('?')[:12]
+    
+    context = {
+        'rooms': rooms_paginated,
+        'topics': topics,
+        'room_count': room_count,
+        'room_messages': room_messages,
+        'users': users,  # Make sure this is in the context
+    }
     return render(request, 'base/home.html', context)
 
 
 def room(request, pk):
     room = Room.objects.get(id=pk)
-    room_messages = room.message_set.all()
+    # Get messages in chronological order
+    room_messages = room.message_set.all().order_by('created')
     participants = room.participants.all()
 
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.error(request, 'Please login to send messages in this chat room.')
+            return redirect('room', pk=room.id)
+        
         message = Message.objects.create(
             user=request.user,
             room=room,
@@ -101,8 +119,29 @@ def room(request, pk):
         room.participants.add(request.user)
         return redirect('room', pk=room.id)
 
-    context = {'room': room, 'room_messages': room_messages,
-               'participants': participants}
+    # Group messages by date
+    messages_by_date = {}
+    for message in room_messages:
+        date = message.created.date()
+        date_str = None
+        
+        if date == timezone.now().date():
+            date_str = "Today"
+        elif date == timezone.now().date() - timezone.timedelta(days=1):
+            date_str = "Yesterday"
+        else:
+            date_str = date.strftime("%B %d, %Y")
+            
+        if date_str not in messages_by_date:
+            messages_by_date[date_str] = []
+        messages_by_date[date_str].append(message)
+
+    context = {
+        'room': room,
+        'room_messages': room_messages,
+        'participants': participants,
+        'messages_by_date': messages_by_date,
+    }
     return render(request, 'base/room.html', context)
 
 

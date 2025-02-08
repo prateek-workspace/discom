@@ -2,8 +2,19 @@
 <header class="header header--loggedIn">
   <div class="container">
     <a href="{% url 'home' %}" class="header__logo">
-      <img src="{% static 'images/logo.svg' %}" />
-      <h1>Discom</h1>
+      <div class="logo">
+        <div class="logo__symbol">
+          <div class="logo__circle">
+            <div class="logo__chat-bubble"></div>
+            <div class="logo__connection-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+        <div class="logo__text">Discom</div>
+      </div>
     </a>
     <form class="header__search" method="get" action="{% url 'home' %}">
       <label>
@@ -21,10 +32,13 @@
     {% if request.user.is_authenticated %}
       <div class="header__user">
         <a href="{% url 'user-profile' user.id %}">
-          <div class="avatar avatar--medium active">
+          <div class="avatar avatar--small active">
             <img src="{{request.user.avatar.url}}" />
           </div>
-          <p>{{request.user.username.upper}}<span>@{{request.user.username}}</span></p>
+          <div class="header__user-info">
+            <span class="header__user-name">{{request.user.name}}</span>
+            <span class="header__user-handle">@{{request.user.username}}</span>
+          </div>
         </a>
         <button class="dropdown-button">
           <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
@@ -69,13 +83,3 @@
     </nav>
   </div>
 </header>
-
-
-
-
-<!-- {% if request.user.is_authenticated %}
-<p>Hello {{request.user}}</p>
-<a href="{% url 'logout' %}">Logout</a>
-{% else %}
-<a href="{% url 'login' %}">Login</a>
-{% endif %} -->

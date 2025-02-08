@@ -37,3 +37,31 @@
     </div>
 </div>
 {% endfor %}
+
+{% if rooms.paginator.num_pages > 1 %}
+<div class="pagination">
+    {% if rooms.has_previous %}
+        <a href="?page={{ rooms.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+    {% endif %}
+
+    {% for num in rooms.paginator.page_range %}
+        {% if num == rooms.number %}
+            <span class="pagination-number active">{{ num }}</span>
+        {% else %}
+            <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-number">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if rooms.has_next %}
+        <a href="?page={{ rooms.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M9 18l6-6-6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+    {% endif %}
+</div>
+{% endif %}
