@@ -81,7 +81,7 @@ def home(request):
     paginator = Paginator(rooms, 4)
     page = request.GET.get('page', 1)
     rooms_paginated = paginator.get_page(page)
-    
+
     topics = Topic.objects.all()[0:5]
     room_count = Room.objects.count()
     room_messages = Message.objects.filter(
@@ -89,7 +89,7 @@ def home(request):
 
     # Get active users, ordered randomly, limited to 12
     users = User.objects.filter(is_active=True).order_by('?')[:12]
-    
+
     context = {
         'rooms': rooms_paginated,
         'topics': topics,
@@ -110,7 +110,7 @@ def room(request, pk):
         if not request.user.is_authenticated:
             messages.error(request, 'Please login to send messages in this chat room.')
             return redirect('room', pk=room.id)
-        
+
         message = Message.objects.create(
             user=request.user,
             room=room,
@@ -124,14 +124,14 @@ def room(request, pk):
     for message in room_messages:
         date = message.created.date()
         date_str = None
-        
+
         if date == timezone.now().date():
             date_str = "Today"
         elif date == timezone.now().date() - timezone.timedelta(days=1):
             date_str = "Yesterday"
         else:
             date_str = date.strftime("%B %d, %Y")
-            
+
         if date_str not in messages_by_date:
             messages_by_date[date_str] = []
         messages_by_date[date_str].append(message)
@@ -258,4 +258,3 @@ def joinRoom(request):
         roomID = request.POST['roomID']
         return redirect("/meeting?roomID=" + roomID)
     return render(request, 'base/vc_joinroom.html')
-
