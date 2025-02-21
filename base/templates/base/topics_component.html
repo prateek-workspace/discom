@@ -9,7 +9,7 @@
     </li>
     {% for topic in topics %}
     <li>
-      <a href="{% url 'home' %}?q={{topic.name}}" class="{% if topic.name == topic.name %}active{% endif %}">{{ topic.name }} 
+      <a href="{% url 'home' %}?q={{topic.name}}" class="{% if topic.name == topic.name %}active{% endif %}">{{ topic.name }}
         <span>{{topic.room_set.all.count}}</span>
       </a>
     </li>
