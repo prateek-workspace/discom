@@ -10,6 +10,70 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <title>Discom - Find study partners around the world!</title>
+    <script src="{% static 'js/ai-interactions.js' %}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM Content Loaded');
+        
+        document.querySelectorAll('.ask-ai-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                const messageContainer = this.closest('.message');
+                const messageId = messageContainer.dataset.messageId;
+                const messageText = messageContainer.querySelector('.message-body').textContent.trim();
+                const responseContainer = messageContainer.querySelector('.ai-response-container');
+                const responseElement = messageContainer.querySelector('.ai-response');
+                
+                console.log('AI button clicked for message:', messageId);
+                
+                // Show loading state
+                responseContainer.style.display = 'block';
+                responseElement.innerHTML = '<div class="loading"></div> Getting AI response...';
+                
+                try {
+                    const response = await fetch('/api/ai-response/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({ 
+                            message_id: messageId,
+                            message: messageText
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        responseElement.textContent = data.response;
+                    } else {
+                        responseElement.textContent = 'Error getting AI response';
+                    }
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    responseElement.textContent = 'Error: Could not get AI response';
+                }
+            });
+        });
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    </script>
   </head>
 
   <body>

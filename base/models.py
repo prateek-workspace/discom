@@ -49,3 +49,11 @@ class Message(models.Model):
 
     def __str__(self):
         return self.body[0:50]
+
+class AIResponse(models.Model):
+    message = models.ForeignKey('Message', on_delete=models.CASCADE, related_name='ai_responses')
+    response_text = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created']

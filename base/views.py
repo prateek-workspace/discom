@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from datetime import datetime
+from .services.ai_service import get_ai_response
 
 # Create your views here.
 
@@ -102,7 +103,6 @@ def home(request):
 
 def room(request, pk):
     room = Room.objects.get(id=pk)
-    # Get messages in chronological order
     room_messages = room.message_set.all().order_by('created')
     participants = room.participants.all()
 
@@ -111,11 +111,34 @@ def room(request, pk):
             messages.error(request, 'Please login to send messages in this chat room.')
             return redirect('room', pk=room.id)
 
-        message = Message.objects.create(
-            user=request.user,
-            room=room,
-            body=request.POST.get('body')
-        )
+        message_text = request.POST.get('body')
+        
+        # Check if message is a help command
+        if message_text.startswith('/help '):
+            # Extract the question
+            question = message_text[6:].strip()
+            # Get AI response
+            ai_response = get_ai_response(question)
+            # Create user's question message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=message_text
+            )
+            # Create AI's response message
+            Message.objects.create(
+                user=request.user,  # or you could create a system user for AI
+                room=room,
+                body=f"🤖 AI Response: {ai_response}"
+            )
+        else:
+            # Normal message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=message_text
+            )
+        
         room.participants.add(request.user)
         return redirect('room', pk=room.id)
 

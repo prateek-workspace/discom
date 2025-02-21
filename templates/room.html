@@ -1,0 +1,30 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<div class="room-container">
+    <!-- Add help text -->
+    <div class="help-text" style="margin-bottom: 20px; color: #666; font-size: 14px;">
+        💡 Tip: Type "/help your question" to get AI assistance
+    </div>
+    
+    <div class="message-container">
+        {% for date, messages in messages_by_date.items %}
+            <div class="date-separator">{{ date }}</div>
+            {% for message in messages %}
+                <div class="message" data-message-id="{{ message.id }}">
+                    <div class="message-header">
+                        <img src="{{message.user.avatar.url}}" alt="Avatar"/>
+                        <span>@{{message.user.username}}</span>
+                        <small>{{message.created|timesince}} ago</small>
+                    </div>
+                    
+                    <div class="message-body">
+                        {{message.body}}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 
