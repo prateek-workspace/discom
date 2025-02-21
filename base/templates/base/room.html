@@ -2,29 +2,6 @@
 {% load static %}
 
 {% block content %}
-<style>
-  .ai-response {
-    background-color: #f0f7ff;
-    border-left: 4px solid #0066cc;
-    padding: 12px;
-    margin-top: 8px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-  
-  .ai-badge {
-    background-color: #0066cc;
-    color: white;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.8em;
-    margin-bottom: 8px;
-    display: inline-block;
-  }
-</style>
-
 {% if messages %}
 <div class="alert alert--error">
   {% for message in messages %}
@@ -129,15 +106,7 @@
                       </div>
                     {% endif %}
                     <div class="thread__details">
-                      {% if message.body.startswith('/help') %}
-                        {{message.body}}
-                        <div class="ai-response">
-                          <span class="ai-badge">AI Assistant</span>
-                          {{message.ai_response}}
-                        </div>
-                      {% else %}
-                        {{message.body}}
-                      {% endif %}
+                      {{message.body}}
                     </div>
                   </div>
                 {% endfor %}
