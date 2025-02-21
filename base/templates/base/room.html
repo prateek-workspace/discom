@@ -2,6 +2,29 @@
 {% load static %}
 
 {% block content %}
+<style>
+  .ai-response {
+    background-color: #f0f7ff;
+    border-left: 4px solid #0066cc;
+    padding: 12px;
+    margin-top: 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  .ai-badge {
+    background-color: #0066cc;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-bottom: 8px;
+    display: inline-block;
+  }
+</style>
+
 {% if messages %}
 <div class="alert alert--error">
   {% for message in messages %}
@@ -106,7 +129,15 @@
                       </div>
                     {% endif %}
                     <div class="thread__details">
-                      {{message.body}}
+                      {% if message.body.startswith('/help') %}
+                        {{message.body}}
+                        <div class="ai-response">
+                          <span class="ai-badge">AI Assistant</span>
+                          {{message.ai_response}}
+                        </div>
+                      {% else %}
+                        {{message.body}}
+                      {% endif %}
                     </div>
                   </div>
                 {% endfor %}
@@ -155,23 +186,24 @@
     <!--  End -->
   </div>
 </main>
+
 <script>
-  let lastScrollTop = 0;
-  const roomBox = document.querySelector('.room__box');
-  const header = document.querySelector('.room__top');
+  // Function to scroll to bottom of messages
+  function scrollToBottom() {
+    const threadsContainer = document.querySelector('.threads');
+    if (threadsContainer) {
+      threadsContainer.scrollTop = threadsContainer.scrollHeight;
+    }
+  }
 
-  if (roomBox && header) {
-    roomBox.addEventListener('scroll', () => {
-      const currentScroll = roomBox.scrollTop;
+  // Scroll to bottom when page loads
+  document.addEventListener('DOMContentLoaded', scrollToBottom);
 
-      if (currentScroll > lastScrollTop && currentScroll > 60) {
-        header.style.transform = 'translateY(-100%)';
-      } else {
-        header.style.transform = 'translateY(0)';
-      }
-
-      lastScrollTop = currentScroll;
-    });
+  // Scroll to bottom when new messages are added
+  const threadsContainer = document.querySelector('.threads');
+  if (threadsContainer) {
+    const observer = new MutationObserver(scrollToBottom);
+    observer.observe(threadsContainer, { childList: true, subtree: true });
   }
 </script>
 {% endblock content %}
