@@ -164,10 +164,26 @@ STATIC_ROOT = BASE_DIR/ 'static_collected'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Login URL Configuration
-LOGIN_URL = 'login'
+# Authentication Settings
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # Default backend for email login
+    'allauth.account.auth_backends.AuthenticationBackend',  # Required for Google login
+)
+
+# AllAuth Settings
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Set to 'mandatory' if you want email verification
+
+# Social Account Settings
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Automatically create user account on successful social login
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+# Login URL Configuration
+LOGIN_URL = 'login'
 
 # if you want to allow anyone to just access the site data using api, set this to true
 
@@ -181,11 +197,6 @@ CORS_ALLOWED_ORIGINS = [
     'https://localhost:8000',
     'https://localhost:9000',
     'https://127.0.0.1:8000',
-]
-
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend'
 ]
 
 SOCIALACCOUNT_LOGIN_ON_GET = True

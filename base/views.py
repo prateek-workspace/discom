@@ -10,15 +10,9 @@ from django.core.paginator import Paginator
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from datetime import datetime
-from .services.ai_service import get_ai_response
+from .services.ai_service import get_ai_response, get_summary, get_grade, get_quiz, check_quiz_answers, explain_quiz
+from allauth.socialaccount.models import SocialAccount
 
-# Create your views here.
-
-# rooms = [
-#     {'id': 1, 'name': 'Lets learn python!'},
-#     {'id': 2, 'name': 'Design with me'},
-#     {'id': 3, 'name': 'Frontend developers'},
-# ]
 
 
 def loginPage(request):
@@ -39,7 +33,8 @@ def loginPage(request):
         user = authenticate(request, email=email, password=password)
 
         if user is not None:
-            login(request, user)
+            # Use ModelBackend for email login
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             next_url = request.GET.get('next')
             if next_url:
                 return redirect(next_url)
@@ -65,7 +60,8 @@ def registerPage(request):
             user = form.save(commit=False)
             user.username = user.username.lower()
             user.save()
-            login(request, user)
+            # Use ModelBackend for email registration
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('home')
         else:
             messages.error(request, 'An error occurred during registration')
@@ -131,9 +127,108 @@ def room(request, pk):
             )
             # Create AI's response message
             Message.objects.create(
-                user=request.user,  # or you could create a system user for AI
+                user=request.user,
                 room=room,
                 body=f"🤖 AI Response: {ai_response}"
+            )
+        # Check if message is a summarize command
+        elif message_text.startswith('/summarize '):
+            # Extract the content to summarize
+            content = message_text[10:].strip()
+            # Get AI summary
+            summary = get_summary(content)
+            # Create user's request message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=message_text
+            )
+            # Create AI's summary message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=f"🤖 Summary:\n{summary}"
+            )
+        # Check if message is a grade command
+        elif message_text.startswith('/grade '):
+            # Extract the assignment content
+            content = message_text[7:].strip()
+            # Get assignment analysis
+            analysis = get_grade(content)
+            # Create user's request message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=message_text
+            )
+            # Create AI's grading message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=f"🤖 Assignment Analysis:\n{analysis}"
+            )
+        # Check if message is a quiz command
+        elif message_text.startswith('/quiz '):
+            # Extract the quiz topic
+            topic = message_text[6:].strip()
+            # Generate quiz
+            quiz = get_quiz(topic)
+            # Create user's request message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=message_text
+            )
+            # Create AI's quiz message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=f"🤖 Quiz Time!\n{quiz}"
+            )
+        # Check if message is a check command
+        elif message_text.startswith('/check '):
+            # Extract quiz ID and answers
+            parts = message_text[7:].strip().split()
+            if len(parts) == 2:
+                quiz_id = parts[0]
+                answers = parts[1]
+                # Check answers
+                results = check_quiz_answers(quiz_id, answers)
+                # Create user's submission message
+                Message.objects.create(
+                    user=request.user,
+                    room=room,
+                    body=message_text
+                )
+                # Create AI's results message
+                Message.objects.create(
+                    user=request.user,
+                    room=room,
+                    body=f"🤖 Quiz Results:\n{results}"
+                )
+            else:
+                Message.objects.create(
+                    user=request.user,
+                    room=room,
+                    body="❌ Invalid format. Please use: /check [Quiz ID] [answers]"
+                )
+        # Check if message is an explain-quiz command
+        elif message_text.startswith('/explain-quiz '):
+            # Extract quiz ID
+            quiz_id = message_text[13:].strip()
+            # Get explanations
+            explanations = explain_quiz(quiz_id)
+            # Create user's request message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=message_text
+            )
+            # Create AI's explanation message
+            Message.objects.create(
+                user=request.user,
+                room=room,
+                body=f"🤖 Quiz Explanations:\n{explanations}"
             )
         else:
             # Normal message
