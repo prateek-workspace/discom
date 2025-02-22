@@ -34,14 +34,18 @@ def loginPage(request):
             user = User.objects.get(email=email)
         except:
             messages.error(request, 'User does not exist')
+            return redirect('login')
 
         user = authenticate(request, email=email, password=password)
 
         if user is not None:
             login(request, user)
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
             return redirect('home')
         else:
-            messages.error(request, 'Username OR password does not exit')
+            messages.error(request, 'Username OR password does not exist')
 
     context = {'page': page}
     return render(request, 'base/login_register.html', context)
